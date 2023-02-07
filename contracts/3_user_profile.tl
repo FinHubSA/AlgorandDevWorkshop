@@ -1,0 +1,88 @@
+#pragma version 8
+
+# 38 bytes
+# MBR cost of 30500 <(2500 per box) + (400 * (box size + key size))>
+# birthday: dd/mm/yyyy
+struct UserInfo:
+    birthday: bytes[10]
+    favourite_colour: bytes[20]
+    number_of_pets: int
+end
+
+const bytes USERS = "users"
+const bytes STATUS = "status"
+
+if Txn.ApplicationID == 0:
+    app_global_put(USERS, 0)
+    exit(1)
+end
+
+switch Txn.OnCompletion:
+    NoOp: main
+    OptIn: opt_in
+    CloseOut: close_out
+    UpdateApplication: update_app
+    DeleteApplication: delete_app
+end
+
+block opt_in:
+    # caller opting-in (creating a profile) must pay for the MBR cost of their box
+    assert(Gtxn[-1].TypeEnum == Pay)
+    assert(Gtxn[-1].Sender == Txn.Sender)
+    assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)
+    assert(Gtxn[-1].Amount == 30500)
+
+    bytes birthday = Txn.ApplicationArgs[0]
+    bytes favourite_colour = Txn.ApplicationArgs[1]
+    int number_of_pets = btoi(Txn.ApplicationArgs[2])
+
+    box<UserInfo> info_box = CreateBox(Txn.Sender)
+    info_box.birthday = birthday
+    info_box.favourite_colour = favourite_colour
+    info_box.number_of_pets = number_of_pets
+
+    app_local_put(Txn.Sender, STATUS, "")
+
+    app_global_put(USERS, app_global_get(USERS) + 1)
+    exit(1)
+end
+
+block close_out:
+    assert(box_del(Txn.Sender))
+    app_global_put(USERS, app_global_get(USERS) - 1)
+    exit(1)
+end
+
+block update_app:
+    exit(0)
+end
+
+block delete_app:
+    exit(0)
+end
+
+block main:
+    switch Txn.ApplicationArgs[0]:
+        "update_user_info": update_user_info
+        "set_status": set_status
+    end
+
+    block update_user_info:
+        bytes birthday = Txn.ApplicationArgs[1]
+        bytes favourite_colour = Txn.ApplicationArgs[2]
+        int number_of_pets = btoi(Txn.ApplicationArgs[3])
+
+        box<UserInfo> info_box = OpenBox(Txn.Sender)
+        info_box.birthday = birthday
+        info_box.favourite_colour = favourite_colour
+        info_box.number_of_pets = number_of_pets
+        exit(1)
+    end
+
+    block set_status:
+        app_local_put(Txn.Sender, STATUS, Txn.ApplicationArgs[1])
+        exit(1)
+    end
+
+    exit(1)
+end
