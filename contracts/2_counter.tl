@@ -1,5 +1,9 @@
 #pragma version 8
 
+# This smart contract keeps and increments a counter in global storage.
+# Global state schema: 1 uints, 0 bytes
+# Local state schema: 0 uints, 0 bytes
+
 const bytes COUNTER = "counter"
 
 if Txn.ApplicationID == 0:
@@ -37,7 +41,6 @@ block main:
     end
 
     block increment_counter:
-        assert(Txn.Sender == Global.CreatorAddress)
         int counter_value = app_global_get(COUNTER)
         if counter_value < 3:
             app_global_put(COUNTER, counter_value + 1)

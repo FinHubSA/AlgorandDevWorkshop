@@ -1,8 +1,13 @@
 #pragma version 8
 
-# 38 bytes
-# MBR cost of 30500 <(2500 per box) + (400 * (box size + key size))>
-# birthday: dd/mm/yyyy
+# This smart contract maintains user profiles for a hypothetical social netoworking app.
+# Global state schema: 1 uints, 0 bytes
+# Local state schema: 0 uints, 1 bytes
+
+# Box size: 38 bytes = 10 + 20 + 8 (int is 64 bits = 8 bytes)
+# Key size: 32 bytes (always an address)
+# MBR: 30500 = 2500 + 400 * (box size + key size) = 2500 + 400 * (38 + 32)
+# birthday field intended format is dd/mm/yyyy
 struct UserInfo:
     birthday: bytes[10]
     favourite_colour: bytes[20]
@@ -26,7 +31,7 @@ switch Txn.OnCompletion:
 end
 
 block opt_in:
-    # caller opting-in (creating a profile) must pay for the MBR cost of their box
+    # Sender opting-in (creating a profile) must pay for the MBR cost of their box
     assert(Gtxn[-1].TypeEnum == Pay)
     assert(Gtxn[-1].Sender == Txn.Sender)
     assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)

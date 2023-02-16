@@ -1,17 +1,8 @@
 # Adapted from the Beaker framework
+# https://github.com/algorand-devrel/beaker
 
-from typing import Any
 from base64 import b64decode
-
-
-def _str_or_hex(v: bytes) -> str:
-    decoded: str = ""
-    try:
-        decoded = v.decode("utf-8")
-    except Exception:
-        decoded = v.hex()
-
-    return decoded
+from typing import Any
 
 
 def decode_state(
@@ -42,3 +33,13 @@ def decode_state(
 
         decoded_state[key] = val
     return decoded_state
+
+
+def _str_or_hex(v: bytes) -> str:
+    decoded: str = ""
+    try:
+        decoded = v.decode("utf-8")
+    except Exception:
+        decoded = v.hex()
+
+    return decoded

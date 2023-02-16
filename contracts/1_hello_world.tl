@@ -1,5 +1,9 @@
 #pragma version 8
 
+# A simple smart contract that logs "Hello, world!".
+# Global state schema: 0 uints, 0 bytes
+# Local state schema: 0 uints, 0 bytes
+
 if Txn.ApplicationID == 0:
     exit(1)
 end

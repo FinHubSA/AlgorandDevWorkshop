@@ -1,25 +1,16 @@
-from base64 import b64decode
-
+from algosdk.kmd import KMDClient
 from algosdk.v2client.algod import AlgodClient
 from algosdk.v2client.indexer import IndexerClient
 
+ALGOD_ADDRESS = "http://localhost:4001"
+ALGOD_TOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-def algod_client() -> AlgodClient:
-    """Instantiate and return Algod client object."""
+INDEXER_ADDRESS = "http://localhost:8980"
+INDEXER_TOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-    algod_address = "http://localhost:4001"
-    algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    return AlgodClient(algod_token, algod_address)
+KMD_ADDRESS = "http://localhost:4002"
+KMD_TOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
-
-def indexer_client() -> IndexerClient:
-    """Instantiate and return Indexer client object."""
-
-    indexer_address = "http://localhost:8980"
-    indexer_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-    return IndexerClient(indexer_token, indexer_address)
-
-
-def compile_program(source_code) -> bytes:
-    compile_response = algod_client().compile(source_code)
-    return b64decode(compile_response["result"])
+algod_client = AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS)
+indexer_client = IndexerClient(INDEXER_TOKEN, INDEXER_ADDRESS)
+kmd_client = KMDClient(KMD_TOKEN, KMD_ADDRESS)
