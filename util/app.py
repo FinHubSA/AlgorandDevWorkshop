@@ -39,8 +39,8 @@ def deploy_app(
                         sender=address,
                         sp=sp,
                         on_complete=OnComplete.NoOpOC.real,
-                        approval_program=compile_program(approval.read()),
-                        clear_program=compile_program(clear.read()),
+                        approval_program=_compile_program(approval.read()),
+                        clear_program=_compile_program(clear.read()),
                         global_schema=global_schema,
                         local_schema=local_schema,
                     ),
@@ -54,6 +54,6 @@ def deploy_app(
             return app_id, app_address
 
 
-def compile_program(source_code) -> bytes:
+def _compile_program(source_code: str) -> bytes:
     compile_response = algod_client.compile(source_code)
     return b64decode(compile_response["result"])
