@@ -81,7 +81,7 @@ class TestUserProfile:
             self.app_id, decode_address(self.user_address)
         )
 
-        assert encode_address(box["name"]) == self.user_address
+        assert encode_address(b64decode(box["name"])) == self.user_address
 
         box_value = b64decode(box["value"])
 
@@ -179,7 +179,7 @@ class TestUserProfile:
             self.app_id, decode_address(self.user_address)
         )
 
-        assert encode_address(box["name"]) == self.user_address
+        assert encode_address(b64decode(box["name"])) == self.user_address
 
         box_value = b64decode(box["value"])
 
