@@ -247,6 +247,33 @@ class TestAuction:
 
         assert seller_balance_after - seller_balance_before == bid_price
 
+        global_state = decode_state(
+            algod_client.application_info(self.app_id)["params"]["global-state"]
+        )
+
+        assert global_state["total_auctions"] == 1
+        assert global_state["live_auctions"] == 0
+
+        local_state = decode_state(
+            algod_client.account_application_info(self.seller_address, self.app_id)[
+                "app-local-state"
+            ]["key-value"]
+        )
+
+        assert local_state["auctions_created"] == 1
+        assert local_state["live_auctions"] == 0
+        assert local_state["auctions_won"] == 0
+
+        local_state = decode_state(
+            algod_client.account_application_info(self.bidder_address_1, self.app_id)[
+                "app-local-state"
+            ]["key-value"]
+        )
+
+        assert local_state["auctions_created"] == 0
+        assert local_state["live_auctions"] == 0
+        assert local_state["auctions_won"] == 1
+
         try:
             algod_client.application_box_by_name(
                 self.app_id,
