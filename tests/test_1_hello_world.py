@@ -51,3 +51,5 @@ class TestHelloWorld:
 
         assert len(logs) == 1
         assert b64decode(logs.pop()).decode("utf-8") == "Hello, world!"
+
+# a function that does xyz

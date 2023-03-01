@@ -1,6 +1,6 @@
 #pragma version 8
 
-# This smart contract maintains user profiles for a hypothetical social netoworking app.
+# This smart contract maintains user profiles for a hypothetical social networking app.
 # Global state schema: 1 uints, 0 bytes
 # Local state schema: 0 uints, 1 bytes
 

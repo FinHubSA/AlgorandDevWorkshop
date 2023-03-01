@@ -1,5 +1,8 @@
 # Algorand Developer Workshop
 
+## Acknowledgements
+Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitPod setup.
+
 ## Getting Started
 1. Make sure you have a [GitHub account](https://github.com/join).
 1. Ensure you have [VS Code](https://code.visualstudio.com/).
@@ -17,3 +20,5 @@
     1. Run `pip3 install -r requirements.txt` in the root directory to install all required dependencies.
     1. Run `./compile.sh` in the root directory to compile all Tealish programs in the `contracts/` directory. You will have to rerun this command every time you make changes to any of the contracts before testing.
     2. Do NOT cancel any of the running processes of any terminals opened by default. This includes exiting the terminal itself (don't do it).
+
+run `pytest` to test the contracts. If they all succeed, you're ready to go!

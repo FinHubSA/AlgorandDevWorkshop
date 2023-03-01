@@ -100,7 +100,7 @@ class TestAuction:
             algod_client.application_info(self.app_id)["params"]["global-state"]
         )
 
-        assert global_state["total_auctions"] == 1
+        assert global_state["auctions_created"] == 1
         assert global_state["live_auctions"] == 1
 
         local_state = decode_state(
@@ -251,7 +251,7 @@ class TestAuction:
             algod_client.application_info(self.app_id)["params"]["global-state"]
         )
 
-        assert global_state["total_auctions"] == 1
+        assert global_state["auctions_created"] == 1
         assert global_state["live_auctions"] == 0
 
         local_state = decode_state(
@@ -282,7 +282,7 @@ class TestAuction:
         except AlgodHTTPError as e:
             assert e.code == 404
 
-    def test_place_bid_two(self) -> None:
+    def test_place_bid_two_bidders(self) -> None:
         unit_name = "TEST"
         asset_name = "My Test Ticket"
         end_timestamp = int(time() + 5)
@@ -355,7 +355,7 @@ class TestAuction:
         assert box_current_price == bid_price_2
         assert box_current_bidder == self.bidder_address_2
 
-    def test_place_bid_buyout_two(self) -> None:
+    def test_place_bid_buyout_two_bidders(self) -> None:
         unit_name = "TEST"
         asset_name = "My Test Ticket"
         end_timestamp = int(time() + 5)

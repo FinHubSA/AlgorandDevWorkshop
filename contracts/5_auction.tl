@@ -19,7 +19,7 @@ struct AuctionValue:
     current_bidder: bytes[32]
 end
 
-const bytes G_TOTAL_AUCTIONS = "total_auctions"
+const bytes G_AUCTIONS_CREATED = "auctions_created"
 const bytes G_LIVE_AUCTIONS = "live_auctions"
 const bytes L_AUCTIONS_CREATED = "auctions_created"
 const bytes L_LIVE_AUCTIONS = "live_auctions"
@@ -31,7 +31,7 @@ const bytes PLACE_BID = "place_bid"
 const bytes OPT_IN_ASSET = "opt_in_asset"
 
 if Txn.ApplicationID == 0:
-    app_global_put(G_TOTAL_AUCTIONS, 0)
+    app_global_put(G_AUCTIONS_CREATED, 0)
     app_global_put(G_LIVE_AUCTIONS, 0)
     exit(1)
 end
@@ -52,6 +52,7 @@ block opt_in:
 end
 
 block close_out:
+    assert(app_local_get(Txn.Sender, L_LIVE_AUCTIONS) == 0)
     exit(1)
 end
 
@@ -72,12 +73,14 @@ block main:
     end
 
     block create_auction:
+        # Sender pays for the MBR of their box and the opt-in cost of the NFT they are auctioning
         assert(Gtxn[-3].TypeEnum == Pay)
         assert(Gtxn[-3].Sender == Txn.Sender)
         assert(Gtxn[-3].Receiver == Global.CurrentApplicationAddress)
         # 100_000 for asset opt-in, 40900 for box MBR
         assert(Gtxn[-3].Amount == 140900)
 
+        # Sender must have made a call to this contract to opt into the NFT being auctioned
         assert(Gtxn[-2].TypeEnum == Appl)
         assert(Gtxn[-2].Sender == Txn.Sender)
         assert(Gtxn[-2].ApplicationID == Global.CurrentApplicationID)
@@ -85,6 +88,7 @@ block main:
         # TODO: bug fixed, change to relative index after new pypi release is made for tealish
         assert(Gtxn[Txn.GroupIndex - 2].ApplicationArgs[0] == OPT_IN_ASSET)
 
+        # Opt into the NFT
         assert(Gtxn[-1].TypeEnum == Axfer)
         assert(Gtxn[-1].Sender == Txn.Sender)
         assert(Gtxn[-1].AssetReceiver == Global.CurrentApplicationAddress)
@@ -94,16 +98,15 @@ block main:
         key.seller = Txn.Sender
         key.asset_id = Gtxn[-1].XferAsset
 
-        # Implicitly asserts that the box does not already exist
-        # which is important for us - we do not want a user to make
-        # multiple auctions of the same asset (assumes all assets are NFTs)
+        # Implicitly asserts that the box does not already exist.
+        # This is important - we do not want a user to make multiple
+        # auctions of the same asset (assumes all assets are pure NFTs)
         box<AuctionValue> auction = CreateBox(key)
         auction.end_timestamp = btoi(Txn.ApplicationArgs[1])
         auction.current_price = btoi(Txn.ApplicationArgs[2])
         auction.buyout_price = btoi(Txn.ApplicationArgs[3])
-        # auction.current_bidder = bzero(32)
 
-        app_global_put(G_TOTAL_AUCTIONS, (app_global_get(G_TOTAL_AUCTIONS) + 1))
+        app_global_put(G_AUCTIONS_CREATED, (app_global_get(G_AUCTIONS_CREATED) + 1))
         app_global_put(G_LIVE_AUCTIONS, (app_global_get(G_LIVE_AUCTIONS) + 1))
         app_local_put(Txn.Sender, L_AUCTIONS_CREATED, (app_local_get(Txn.Sender, L_AUCTIONS_CREATED) + 1))
         app_local_put(Txn.Sender, L_LIVE_AUCTIONS, (app_local_get(Txn.Sender, L_LIVE_AUCTIONS) + 1))
@@ -115,6 +118,7 @@ block main:
         AuctionKey key = Txn.ApplicationArgs[1]
         box<AuctionValue> auction = OpenBox(key)
         assert(auction.end_timestamp >= Global.LatestTimestamp)
+        # Only the seller or the winning bidder may end an auction
         assert((Txn.Sender == key.seller) || (Txn.Sender == auction.current_bidder))
 
         # no one bid, close asset back to seller
