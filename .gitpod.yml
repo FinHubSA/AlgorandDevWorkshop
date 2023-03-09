@@ -13,8 +13,14 @@ tasks:
       --algod-token "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
       --data-dir ~/.algodeploy/localnet/data/Node \
       --dev-mode
+      python3 -m venv .venv
+      source .venv/bin/activate
+      pip3 install -r requirements.txt
+      tealish compile contracts
   - name: dappflow
-    command: serve -s ~/dappflow/
+    command: |
+      source .venv/bin/activate
+      serve -s ~/dappflow/
 vscode:
   extensions:
     - ms-python.python

@@ -130,10 +130,6 @@ block main:
             app_local_put(auction.current_bidder, L_AUCTIONS_WON, (app_local_get(auction.current_bidder, L_AUCTIONS_WON) + 1))
         end
 
-        decrement_auction_stats(key.seller)
-
-        int existed = box_del(key)
-
         exit(1)
     end
 
@@ -163,9 +159,8 @@ block main:
         # buyout_price met, end the auction now
         if Gtxn[-1].Amount >= auction.buyout_price:
             settle(key.seller, Txn.Sender, Gtxn[-1].Amount, key.asset_id)
-            decrement_auction_stats(key.seller)
             app_local_put(Txn.Sender, L_AUCTIONS_WON, (app_local_get(Txn.Sender, L_AUCTIONS_WON) + 1))
-            int existed = box_del(key)
+            clean_up_auction(key)
         # buyout_price not met, update the auction details
         else:
             auction.current_price = Gtxn[-1].Amount
@@ -217,12 +212,15 @@ func close_asset(address: bytes, asset_id: int):
     return
 end
 
-func decrement_auction_stats(seller: bytes):
+func clean_up_auction(key_bytes: bytes):
+    AuctionKey key = key_bytes
     app_global_put(G_LIVE_AUCTIONS, (app_global_get(G_LIVE_AUCTIONS) - 1))
-    int auctions_created = app_local_get(seller, L_LIVE_AUCTIONS)
+    int auctions_created = app_local_get(key.seller, L_LIVE_AUCTIONS)
     if auctions_created > 0:
-        app_local_put(seller, L_LIVE_AUCTIONS, (app_local_get(seller, L_LIVE_AUCTIONS) - 1))
+        app_local_put(key.seller, L_LIVE_AUCTIONS, (app_local_get(key.seller, L_LIVE_AUCTIONS) - 1))
     end
+
+    int existed = box_del(key)
 
     return
 end

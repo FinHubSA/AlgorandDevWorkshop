@@ -18,7 +18,6 @@ Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitP
     1. Run `python3 -m venv .venv` in the root directory (`workspace/AlgorandDeveloperWorkshop/`) to create a new virtual Python3 environment (select yes if popup detects new environment and asks to switch the interpreter).
     1. Run `source .venv/bin/activate` in the root directory to activate the virtual environment.
     1. Run `pip3 install -r requirements.txt` in the root directory to install all required dependencies.
-    1. Run `./compile.sh` in the root directory to compile all Tealish programs in the `contracts/` directory. You will have to rerun this command every time you make changes to any of the contracts before testing.
-    2. Do NOT cancel any of the running processes of any terminals opened by default. This includes exiting the terminal itself (don't do it).
+    1. Do NOT cancel any of the running processes of any terminals opened by default. This includes exiting the terminal itself (don't do it).
 
 run `pytest` to test the contracts. If they all succeed, you're ready to go!
