@@ -15,9 +15,12 @@ Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitP
     1. Set up an SSH key pair if none exists by following these [instructions](https://www.gitpod.io/docs/configure/user-settings/ssh#create-an-ssh-key).
     1. If you are asked what OS to use for the remote host, select Linux.
 1. Once set up and VS Code has opened with the environment deployed, you may be asked to trust the authors of the files. Be sure to check the box that trusts the entire `workspace/` and select "Yes, I trust the authors".
-    1. Run `python3 -m venv .venv` in the root directory (`workspace/AlgorandDeveloperWorkshop/`) to create a new virtual Python3 environment (select yes if popup detects new environment and asks to switch the interpreter).
-    1. Run `source .venv/bin/activate` in the root directory to activate the virtual environment.
-    1. Run `pip3 install -r requirements.txt` in the root directory to install all required dependencies.
-    1. Do NOT cancel any of the running processes of any terminals opened by default. This includes exiting the terminal itself (don't do it).
 
-run `pytest` to test the contracts. If they all succeed, you're ready to go!
+### Notes
+* You must enter the virtual environment created for you by running `source .venv/bin/activate` every time you open a new terminal tab. The default "dev" tab is already within the virtual environment.
+*  Do NOT cancel the running processes of any terminals opened by defaul unless you know what you're doing.
+*  Do not delete `.venv` unless you know what you're doing.
+
+## Testing
+1. Compile your Tealish smart contracts in the `contracts` folder by running `tealish compile contracts` in the project root directory.
+2. Run `pytest` to run the tests in the `tests` folder.
