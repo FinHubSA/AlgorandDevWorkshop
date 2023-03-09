@@ -1,7 +1,6 @@
 # Adapted from https://github.com/algorand-devrel/docker-algorand-gitpod
 
-image:
-  file: .gitpod.Dockerfile
+image: joepol/algorand-gitpod:latest
 tasks:
   - name: Algorand
     before: ~/algodeploy/algodeploy.py start
@@ -19,6 +18,15 @@ tasks:
   - name: dappflow
     command: |
       serve -s ~/dappflow/
+  - name: dev
+    init: |
+      cd /workspace/AlgorandDevWorkshop
+      python3 -m .venv .venv
+      source .venv/bin/activate
+      pip3 install -r requirements.txt
+    command: |
+      cd /workspace/AlgorandDevWorkshop
+      source .venv/bin/activate
 vscode:
   extensions:
     - ms-python.python
