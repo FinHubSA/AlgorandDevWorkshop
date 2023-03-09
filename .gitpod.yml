@@ -20,6 +20,7 @@ tasks:
       serve -s ~/dappflow/
   - name: dev
     init: |
+      sudo apt install python3.10-venv
       cd /workspace/AlgorandDevWorkshop
       python3 -m venv .venv
       source .venv/bin/activate
