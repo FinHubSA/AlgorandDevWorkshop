@@ -27,7 +27,6 @@ tasks:
 vscode:
   extensions:
     - ms-python.python
-    - tealish-0.0.1.vsix
 ports:
   - name: dappflow
     port: 3000
