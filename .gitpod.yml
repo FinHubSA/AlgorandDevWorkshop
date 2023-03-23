@@ -15,9 +15,6 @@ tasks:
       --algod-token "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
       --data-dir ~/.algodeploy/localnet/data/Node \
       --dev-mode
-  - name: dappflow
-    command: |
-      serve -s ~/dappflow/
   - name: dev
     init: |
       cd /workspace/AlgorandDevWorkshop
@@ -30,6 +27,7 @@ tasks:
 vscode:
   extensions:
     - ms-python.python
+    - sameer.tealish
 ports:
   - name: dappflow
     port: 3000
