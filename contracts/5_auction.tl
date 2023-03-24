@@ -117,14 +117,15 @@ block main:
     block end_auction:
         AuctionKey key = Txn.ApplicationArgs[1]
         box<AuctionValue> auction = OpenBox(key)
+        # Make sure auction isn't being ended early
         assert(auction.end_timestamp >= Global.LatestTimestamp)
         # Only the seller or the winning bidder may end an auction
         assert((Txn.Sender == key.seller) || (Txn.Sender == auction.current_bidder))
 
-        # no one bid, close asset back to seller
+        # No one bid, close asset back to seller
         if auction.current_bidder == bzero(32):
             close_asset(key.seller, key.asset_id)
-        # at least one person bid, we should settle the payment and asset transfer
+        # At least one person bid, we should settle the payment and asset transfer
         else:
             settle(key.seller, auction.current_bidder, auction.current_price, key.asset_id)
             app_local_put(auction.current_bidder, L_AUCTIONS_WON, (app_local_get(auction.current_bidder, L_AUCTIONS_WON) + 1))

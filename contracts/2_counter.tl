@@ -1,6 +1,6 @@
 #pragma version 8
 
-# This smart contract keeps and increments a counter in global storage.
+# This smart contract stores and situationally increments a counter.
 # Global state schema: 1 uints, 0 bytes
 # Local state schema: 0 uints, 0 bytes
 
