@@ -1,10 +1,6 @@
 # Algorand Developer Workshop
 
-## Acknowledgements
-Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitPod setup.
-
 ## About
-
 A set of Tealish smart contracts and corresponding tests intended for the FinHub Workshop Series.
 
 ## Getting Started
@@ -24,3 +20,6 @@ A set of Tealish smart contracts and corresponding tests intended for the FinHub
 ## Testing
 1. Compile your Tealish smart contracts in the `contracts` folder by running `tealish compile contracts` in the project root directory.
 2. Run `pytest` in the project root directory to run all the tests in the `tests` folder.
+
+## Acknowledgements
+Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitPod setup.
