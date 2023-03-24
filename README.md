@@ -3,12 +3,18 @@
 ## Acknowledgements
 Thank you to [Joe Polny](https://github.com/joe-p) for the Docker image and GitPod setup.
 
+## About
+
+A set of Tealish smart contracts and corresponding tests intended for the FinHub Workshop Series.
+
 ## Getting Started
 1. Make sure you have a [GitHub account](https://github.com/join).
 2. Log into [GitPod](https://www.gitpod.io/) by using your GitHub credentials.
     1. Choose VS Code **BROWSER** as the default editor.
 3. Enter [https://github.com/FinHubSA/AlgorandDevWorkshop](https://github.com/FinHubSA/AlgorandDevWorkshop) as the workshop to open in GitPod.
     1. Keep the default settings (VS Code browser editor and standard class CPU).
+ 4. Wait for the workspace to be set up.
+ 5. Install the `tealish-0.0.1.vsix` VS Code extension in the project root by right clicking it and selecting "Install Extension VSIX".
 
 ### Notes
 *  Do NOT stop the Algorand Indexer process running in a terminal tab unless you know what you're doing.
