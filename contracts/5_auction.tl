@@ -106,6 +106,8 @@ block main:
         auction.current_price = btoi(Txn.ApplicationArgs[2])
         auction.buyout_price = btoi(Txn.ApplicationArgs[3])
 
+        assert((auction.buyout_price >= auction.current_price) || (auction.buyout_price == 0))
+
         app_global_put(G_AUCTIONS_CREATED, (app_global_get(G_AUCTIONS_CREATED) + 1))
         app_global_put(G_LIVE_AUCTIONS, (app_global_get(G_LIVE_AUCTIONS) + 1))
         app_local_put(Txn.Sender, L_AUCTIONS_CREATED, (app_local_get(Txn.Sender, L_AUCTIONS_CREATED) + 1))
@@ -158,7 +160,7 @@ block main:
         end
 
         # buyout_price met, end the auction now
-        if Gtxn[-1].Amount >= auction.buyout_price:
+        if (Gtxn[-1].Amount >= auction.buyout_price) && (auction.buyout_price > 0):
             settle(key.seller, Txn.Sender, Gtxn[-1].Amount, key.asset_id)
             app_local_put(Txn.Sender, L_AUCTIONS_WON, (app_local_get(Txn.Sender, L_AUCTIONS_WON) + 1))
             clean_up_auction(key)

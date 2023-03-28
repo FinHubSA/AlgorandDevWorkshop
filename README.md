@@ -7,10 +7,11 @@ A set of Tealish smart contracts and corresponding tests intended for the FinHub
 1. Make sure you have a [GitHub account](https://github.com/join).
 2. Log into [GitPod](https://www.gitpod.io/) by using your GitHub credentials.
     1. Choose VS Code **BROWSER** as the default editor.
-    2. Fill out the "Tell us more about you" form.
+    2. If it pops up, fill out the "Tell us more about you" form.
 3. On the dashboard, click the "New Workspace" button and copy/paste [https://github.com/FinHubSA/AlgorandDevWorkshop](https://github.com/FinHubSA/AlgorandDevWorkshop) as the Context URL.
     1. Keep the default settings (VS Code browser editor and standard class CPU).
  4. Wait for the workspace to be set up.
+    1. You may safely close all the welcome panels.
  5. There is a `tealish-0.0.1.vsix` VS Code extension in the project root - install it by right clicking it on the file explorer to the left of the editor and selecting "Install Extension VSIX".
 
 ### Notes
