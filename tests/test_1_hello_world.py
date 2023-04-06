@@ -41,15 +41,14 @@ class TestHelloWorld:
                     sp=algod_client.suggested_params(),
                     index=self.app_id,
                     on_complete=OnComplete.NoOpOC.real,
-                    app_args=["greeting"],
                 ),
                 signer=self.manager_txn_signer,
             )
         )
         tx_id = atc.execute(algod_client, 5).tx_ids[0]
         logs: list[bytes] = algod_client.pending_transaction_info(tx_id)["logs"]
+        hello = b64decode(logs.pop()).decode("utf-8")
 
-        assert len(logs) == 1
-        assert b64decode(logs.pop()).decode("utf-8") == "Hello, world!"
+        assert hello == "Hello, world!"
 
-# a function that does xyz
+        print(hello)

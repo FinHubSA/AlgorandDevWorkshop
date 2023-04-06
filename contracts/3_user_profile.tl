@@ -1,5 +1,7 @@
 #pragma version 8
 
+# By Gary Lu - wklu99@gmail.com
+
 # This smart contract maintains user profiles for a hypothetical social networking app.
 # Global state schema: 1 uints, 0 bytes
 # Local state schema: 0 uints, 1 bytes
@@ -14,11 +16,13 @@ struct UserInfo:
     number_of_pets: int
 end
 
+# Global state keys
 const bytes USERS = "users"
+# Local state keys
 const bytes STATUS = "status"
 
 if Txn.ApplicationID == 0:
-    app_global_put(USERS, 0)
+    # TODO: initialize our number of users
     exit(1)
 end
 
@@ -31,30 +35,20 @@ switch Txn.OnCompletion:
 end
 
 block opt_in:
-    # Sender opting-in (creating a profile) must pay for the MBR cost of their box
-    assert(Gtxn[-1].TypeEnum == Pay)
-    assert(Gtxn[-1].Sender == Txn.Sender)
-    assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)
-    assert(Gtxn[-1].Amount == 30500)
+    # TODO: expect a payment txn to cover the MBR of the box we will create
 
-    bytes birthday = Txn.ApplicationArgs[0]
-    bytes favourite_colour = Txn.ApplicationArgs[1]
-    int number_of_pets = btoi(Txn.ApplicationArgs[2])
+    # TODO: create the box to store user info
 
-    box<UserInfo> info_box = CreateBox(Txn.Sender)
-    info_box.birthday = birthday
-    info_box.favourite_colour = favourite_colour
-    info_box.number_of_pets = number_of_pets
+    # TODO: initialize user status
 
-    app_local_put(Txn.Sender, STATUS, "")
-
-    app_global_put(USERS, app_global_get(USERS) + 1)
+    # TODO: increment users
     exit(1)
 end
 
 block close_out:
-    assert(box_del(Txn.Sender))
-    app_global_put(USERS, app_global_get(USERS) - 1)
+    # TODO: delete the user's box
+
+    # TODO: decrement users
     exit(1)
 end
 
@@ -67,25 +61,17 @@ block delete_app:
 end
 
 block main:
+    # TODO: route to the correct block of code based on the first argument
     switch Txn.ApplicationArgs[0]:
-        "update_user_info": update_user_info
-        "set_status": set_status
     end
 
     block update_user_info:
-        bytes birthday = Txn.ApplicationArgs[1]
-        bytes favourite_colour = Txn.ApplicationArgs[2]
-        int number_of_pets = btoi(Txn.ApplicationArgs[3])
-
-        box<UserInfo> info_box = OpenBox(Txn.Sender)
-        info_box.birthday = birthday
-        info_box.favourite_colour = favourite_colour
-        info_box.number_of_pets = number_of_pets
+        # TODO: update user's box
         exit(1)
     end
 
     block set_status:
-        app_local_put(Txn.Sender, STATUS, Txn.ApplicationArgs[1])
+        # TODO: set user status in local state
         exit(1)
     end
 

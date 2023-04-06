@@ -15,7 +15,7 @@ from algosdk.transaction import (
     SuggestedParams,
 )
 
-from util.client import algod_client
+from util.client import algod_client, AlgodClient
 
 BUILD_PATH_PREFIX = path.join(path.dirname(__file__), "../contracts/build/")
 
@@ -27,6 +27,7 @@ def deploy_app(
     sp: SuggestedParams,
     global_schema: StateSchema,
     local_schema: StateSchema,
+    client: AlgodClient = algod_client,
 ) -> tuple[int, str]:
     with open(BUILD_PATH_PREFIX + approval_name, "r") as approval:
         with open(BUILD_PATH_PREFIX + clear_name, "r") as clear:
@@ -47,13 +48,13 @@ def deploy_app(
                     signer=txn_signer,
                 )
             )
-            tx_id = atc.execute(algod_client, 5).tx_ids[0]
-            app_id = algod_client.pending_transaction_info(tx_id)["application-index"]
+            tx_id = atc.execute(client, 5).tx_ids[0]
+            app_id = client.pending_transaction_info(tx_id)["application-index"]
             app_address = get_application_address(app_id)
 
             return app_id, app_address
 
 
-def _compile_program(source_code: str) -> bytes:
-    compile_response = algod_client.compile(source_code)
+def _compile_program(source_code: str, client: AlgodClient = algod_client) -> bytes:
+    compile_response = client.compile(source_code)
     return b64decode(compile_response["result"])

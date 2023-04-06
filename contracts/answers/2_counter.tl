@@ -2,7 +2,7 @@
 
 # By Gary Lu - wklu99@gmail.com
 
-# This smart contract stores and situationally increments a counter.
+# This smart contract stores and increments a counter if its value is less than 3.
 # Global state schema: 1 uints, 0 bytes
 # Local state schema: 0 uints, 0 bytes
 
@@ -10,7 +10,7 @@
 const bytes COUNTER = "counter"
 
 if Txn.ApplicationID == 0:
-    # TODO: initialize our counter
+    app_global_put(COUNTER, 0)
     exit(1)
 end
 
@@ -39,12 +39,15 @@ block delete_app:
 end
 
 block main:
-    # TODO: route to the correct block of code based on the first argument
     switch Txn.ApplicationArgs[0]:
+        "increment_counter": increment_counter
     end
 
     block increment_counter:
-        # TODO: increment our counter in global state if its value is less than 3
+        int counter_value = app_global_get(COUNTER)
+        if counter_value < 3:
+            app_global_put(COUNTER, counter_value + 1)
+        end
         exit(1)
     end
 

@@ -3,7 +3,6 @@ from algosdk.atomic_transaction_composer import (
     AtomicTransactionComposer,
     TransactionWithSigner,
 )
-from algosdk.error import AlgodHTTPError
 from algosdk.transaction import (
     ApplicationCallTxn,
     OnComplete,
@@ -20,16 +19,10 @@ class TestCounter:
     def setup_method(self):
         """Create account(s) and app before each test."""
 
-        account_manager = AccountManager()
-
         (
             self.manager_address,
             self.manager_txn_signer,
-        ) = account_manager.create_new_funded_account()
-        (
-            self.user_address,
-            self.user_txn_signer,
-        ) = account_manager.create_new_funded_account()
+        ) = AccountManager().create_new_funded_account()
 
         self.app_id, self.app_address = deploy_app(
             self.manager_txn_signer,
@@ -60,12 +53,6 @@ class TestCounter:
             self.manager_address, self.manager_txn_signer
         )
         assert global_state["counter"] == 3
-
-    def test_increment_counter_as_non_manager(self):
-        try:
-            self._increment_counter(self.user_address, self.user_txn_signer)
-        except AlgodHTTPError as e:
-            assert "assert failed" in e.args[0]
 
     def _increment_counter(self, address: str, txn_signer: AccountTransactionSigner):
         atc = AtomicTransactionComposer()
