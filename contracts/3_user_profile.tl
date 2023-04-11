@@ -23,7 +23,6 @@ const bytes STATUS = "status"
 
 if Txn.ApplicationID == 0:
     # TODO: initialize our number of users
-    app_global_put(USERS, 0)
     exit(1)
 end
 
@@ -37,32 +36,17 @@ end
 
 block opt_in:
     # TODO: expect a payment txn to cover the MBR of the box we will create
-    assert(Gtxn[-1].TypeEnum == Pay)
-    assert(Gtxn[-1].Sender == Txn.Sender)
-    assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)
-    assert(Gtxn[-1].Amount == 30500)
 
     # TODO: create the box to store user info
-    bytes birthday = Txn.ApplicationArgs[0]
-    bytes favourite_colour = Txn.ApplicationArgs[1]
-    int number_of_pets = btoi(Txn.ApplicationArgs[2])
-
-    box<UserInfo> info_box = CreateBox(Txn.Sender)
-    info_box.birthday = birthday
-    info_box.favourite_colour = favourite_colour
-    info_box.number_of_pets = number_of_pets
 
     # TODO: initialize user status
-    app_local_put(Txn.Sender, STATUS, "")
 
     # TODO: increment users
-    app_global_put(USERS, app_global_get(USERS) + 1)
     exit(1)
 end
 
 block close_out:
     # TODO: decrement users
-    app_global_put(USERS, app_global_get(USERS) - 1)
     exit(1)
 end
 
@@ -77,26 +61,15 @@ end
 block main:
     # TODO: route to the correct block of code based on the first argument
     switch Txn.ApplicationArgs[0]:
-        "update_user_info": update_user_info
-        "set_status": set_status
     end
 
     block update_user_info:
         # TODO: update user's box
-        bytes birthday = Txn.ApplicationArgs[1]
-        bytes favourite_colour = Txn.ApplicationArgs[2]
-        int number_of_pets = btoi(Txn.ApplicationArgs[3])
-
-        box<UserInfo> info_box = OpenBox(Txn.Sender)
-        info_box.birthday = birthday
-        info_box.favourite_colour = favourite_colour
-        info_box.number_of_pets = number_of_pets
         exit(1)
     end
 
     block set_status:
         # TODO: set user status in local state
-        app_local_put(Txn.Sender, STATUS, Txn.ApplicationArgs[1])
         exit(1)
     end
 
