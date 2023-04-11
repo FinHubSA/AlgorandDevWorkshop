@@ -57,7 +57,6 @@ block opt_in:
 end
 
 block close_out:
-    assert(box_del(Txn.Sender))
     app_global_put(USERS, app_global_get(USERS) - 1)
     exit(1)
 end

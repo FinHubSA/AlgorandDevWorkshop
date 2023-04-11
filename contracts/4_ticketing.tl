@@ -52,7 +52,7 @@ block main:
         exit(1)
     end
 
-    block update_ticket_price
+    block update_ticket_price:
         # TODO: update ticket_price
         exit(1)
     end

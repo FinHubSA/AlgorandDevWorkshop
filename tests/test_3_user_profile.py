@@ -124,12 +124,16 @@ class TestUserProfile:
         except AlgodHTTPError as e:
             assert "account application info not found" in e.args[0]
 
-        try:
-            algod_client.application_box_by_name(
-                self.app_id, decode_address(self.user_address)
-            )
-        except AlgodHTTPError as e:
-            assert "box not found" in e.args[0]
+        box = algod_client.application_box_by_name(
+            self.app_id, decode_address(self.user_address)
+        )
+        assert encode_address(b64decode(box["name"])) == self.user_address
+
+        box_value = b64decode(box["value"])
+
+        assert box_value[:10] == birthday
+        assert box_value[10:30] == favourite_colour
+        assert int.from_bytes(box_value[30:], byteorder="big") == number_of_pets
 
     def test_update_user_info(self) -> None:
         birthday = b"10/03/1999"
