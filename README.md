@@ -17,7 +17,7 @@ A set of Tealish smart contracts and corresponding tests intended for the FinHub
 ### Notes
 *  Do not stop the Algorand Indexer process running in a terminal tab unless you know what you're doing.
 *  Do not delete `.venv` unless you know what you're doing.
-*  While this GitPod setup is great to get into smart contract development quickly, it is recommended that you set up a local environment on your computer for prolonged learning. Take a look at the [Sandbox](https://github.com/algorand/sandbox).
+*  While this GitPod setup is great to get into smart contract development quickly, it is recommended that you set up a local environment on your computer for prolonged learning. Take a look at the [Sandbox](https://github.com/algorand/sandbox) or, alternatively, [AlgoKit](https://github.com/algorandfoundation/algokit-cli).
 
 ## Testing
 1. Compile your Tealish smart contracts in the `contracts` folder by running `tealish compile contracts` in the terminal at the project root directory (`/workspace/AlgorandDevWorkshop`).
