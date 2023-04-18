@@ -39,10 +39,10 @@ const bytes L_AUCTIONS_WON = "auctions_won"
 const bytes CREATE_AUCTION = "create_auction"
 const bytes SETTLE = "settle"
 const bytes PLACE_BID = "place_bid"
-const bytes OPT_IN_ASSET = "opt_in_asset"
 
 # Constants
 const int MINIMUM_BID = 10000
+# Box MBR + asset opt-in MBR = 47300 + 100,000
 const int AUCTION_MBR_AMOUNT = 147300
 
 if Txn.ApplicationID == 0:
@@ -84,33 +84,34 @@ block main:
         CREATE_AUCTION: create_auction
         SETTLE: settle
         PLACE_BID: place_bid
-        OPT_IN_ASSET: opt_in_asset
     end
 
     block create_auction:
-        # Sender pays for the MBR of their box and the opt-in cost of the NFT they are auctioning
-        assert(Gtxn[-3].TypeEnum == Pay)
-        assert(Gtxn[-3].Sender == Txn.Sender)
-        assert(Gtxn[-3].Receiver == Global.CurrentApplicationAddress)
-        assert(Gtxn[-3].Amount == AUCTION_MBR_AMOUNT)
-
-        # Sender must have made a call to this contract to opt into the NFT being auctioned
-        assert(Gtxn[-2].TypeEnum == Appl)
-        assert(Gtxn[-2].Sender == Txn.Sender)
-        assert(Gtxn[-2].ApplicationID == Global.CurrentApplicationID)
-        assert(Gtxn[-2].OnCompletion == NoOp)
-        # TODO: bug fixed, change to relative index after new pypi release is made for tealish
-        assert(Gtxn[Txn.GroupIndex - 2].ApplicationArgs[0] == OPT_IN_ASSET)
+        # Sender pays for the MBR of their box and the NFT opt-in cost the smart contract must pay
+        assert(Gtxn[-1].TypeEnum == Pay)
+        assert(Gtxn[-1].Sender == Txn.Sender)
+        assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)
+        assert(Gtxn[-1].Amount == AUCTION_MBR_AMOUNT)
 
         # Send NFT to contract
-        assert(Gtxn[-1].TypeEnum == Axfer)
-        assert(Gtxn[-1].Sender == Txn.Sender)
-        assert(Gtxn[-1].AssetReceiver == Global.CurrentApplicationAddress)
-        assert(Gtxn[-1].AssetAmount == 1)
+        assert(Gtxn[+1].TypeEnum == Axfer)
+        assert(Gtxn[+1].Sender == Txn.Sender)
+        assert(Gtxn[+1].AssetReceiver == Global.CurrentApplicationAddress)
+        assert(Gtxn[+1].XferAsset == Txn.Assets[0])
+        assert(Gtxn[+1].AssetAmount == 1)
+
+        # Opt into the NFT being auctioned
+        inner_txn:
+            TypeEnum: Axfer
+            Sender: Global.CurrentApplicationAddress
+            XferAsset: Txn.Assets[0]
+            AssetReceiver: Global.CurrentApplicationAddress
+            Fee: 0
+        end
 
         AuctionKey key = bzero(40)
         key.seller = Txn.Sender
-        key.asset_id = Gtxn[-1].XferAsset
+        key.asset_id = Txn.Assets[0]
 
         # Implicitly asserts that the box does not already exist.
         # This is important - we do not want a user to make multiple
@@ -137,7 +138,7 @@ block main:
         AuctionKey key = Txn.ApplicationArgs[1]
         box<AuctionValue> auction = OpenBox(key)
         # Make sure auction isn't being ended early
-        assert(auction.end_timestamp >= Global.LatestTimestamp)
+        assert(Global.LatestTimestamp >= auction.end_timestamp)
 
         if Txn.Sender == key.seller:
             # No one bid, close asset back to seller
@@ -146,7 +147,6 @@ block main:
                 clean_up_auction(key)
             # At least one person bid, pay the seller
             else:
-                # Seller cannot be paid more than once
                 assert(auction.seller_paid == 0)
                 pay_user(key.seller, auction.current_price)
                 auction.seller_paid = 1
@@ -158,13 +158,7 @@ block main:
         elif Txn.Sender == auction.current_bidder:
             # Bidder cannot be sent the NFT more than once
             assert(auction.nft_sent == 0)
-            inner_txn:
-                TypeEnum: Axfer
-                Sender: Global.CurrentApplicationAddress
-                XferAsset: key.asset_id
-                AssetCloseTo: auction.current_bidder
-                Fee: 0
-            end
+            close_asset(auction.current_bidder, key.asset_id)
             app_local_put(auction.current_bidder, L_AUCTIONS_WON, (app_local_get(auction.current_bidder, L_AUCTIONS_WON) + 1))
             auction.nft_sent = 1
             if auction.seller_paid == 1:
@@ -189,8 +183,7 @@ block main:
         assert(Gtxn[-1].Receiver == Global.CurrentApplicationAddress)
         # We only accept the bid if it is better than the current one by at least the minimum bid amount
         assert(Gtxn[-1].Amount >= (auction.current_price + MINIMUM_BID))
-        # Cannot bid after auction has ended
-        assert(auction.end_timestamp < Global.LatestTimestamp)
+        assert(Global.LatestTimestamp < auction.end_timestamp)
 
         if auction.current_bidder != bzero(32):
             # Pay back the current bidder that is being replaced
@@ -209,17 +202,6 @@ block main:
             auction.current_bidder = Txn.Sender
         end
 
-        exit(1)
-    end
-
-    block opt_in_asset:
-        inner_txn:
-            TypeEnum: Axfer
-            Sender: Global.CurrentApplicationAddress
-            XferAsset: Txn.Assets[btoi(Txn.ApplicationArgs[1])]
-            AssetReceiver: Global.CurrentApplicationAddress
-            Fee: 0
-        end
         exit(1)
     end
 
@@ -254,9 +236,7 @@ func clean_up_auction(key_bytes: bytes):
     AuctionKey key = key_bytes
     app_global_put(G_LIVE_AUCTIONS, (app_global_get(G_LIVE_AUCTIONS) - 1))
     int auctions_created = app_local_get(key.seller, L_LIVE_AUCTIONS)
-    if auctions_created > 0:
-        app_local_put(key.seller, L_LIVE_AUCTIONS, (auctions_created - 1))
-    end
+    app_local_put(key.seller, L_LIVE_AUCTIONS, (auctions_created - 1))
 
     int existed = box_del(key)
 
